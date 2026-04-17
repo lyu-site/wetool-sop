@@ -90,11 +90,29 @@
   .naming-box .ex .dim { color: #555; }
   .toc-group { margin-bottom: 12px; }
   .toc-group-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #bbb; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+
+  /* Page switching */
+  .section { display: none; }
+  .section.active { display: block; }
+  .toc-page { display: block; }
+  .toc-page.hidden { display: none; }
+  .toc-item { cursor: pointer; }
+  .toc-item a { cursor: pointer; }
+  .toc-item:hover a { text-decoration: underline; }
+  hr { display: none; }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #f0ede8; border: 1px solid #ddd; border-radius: 6px;
+    padding: 7px 16px; font-size: 12px; font-family: 'Noto Sans TC', sans-serif;
+    color: #555; cursor: pointer; margin-bottom: 28px; font-weight: 500;
+  }
+  .back-btn:hover { background: #e8e5e0; color: #1a1a18; }
 </style>
 </head>
 <body>
 <div class="page">
 
+  <div class="toc-page">
   <div class="doc-header">
     <div class="label">Standard Operating Procedure</div>
     <h1>威拓BIM專案管理規範<br>檔案管理架構說明 與 平台操作指南</h1>
@@ -142,6 +160,8 @@
     </div>
   </div>
   </div>
+  </div><!-- end toc-page -->
+
 
 
   <hr>
@@ -931,5 +951,43 @@
   </div>
 
 </div>
+
+<script>
+function showSection(id) {
+  document.querySelector('.toc-page').classList.add('hidden');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) {
+    target.classList.add('active');
+    if (!target.querySelector('.back-btn')) {
+      const btn = document.createElement('button');
+      btn.className = 'back-btn';
+      btn.innerHTML = '← 返回目錄';
+      btn.onclick = showTOC;
+      target.insertBefore(btn, target.firstChild);
+    }
+  }
+  window.scrollTo(0, 0);
+}
+
+function showTOC() {
+  document.querySelector('.toc-page').classList.remove('hidden');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.toc-item a').forEach(a => {
+    const href = a.getAttribute('href');
+    if (href && href.startsWith('#')) {
+      const id = href.slice(1);
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        showSection(id);
+      });
+    }
+  });
+});
+</script>
 </body>
 </html>
