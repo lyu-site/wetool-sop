@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>威拓BIM專案管理規範 — 檔案管理架構說明與平台操作指南</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans TC', sans-serif; background: #f8f7f4; color: #1a1a18; font-size: 14px; line-height: 1.8; }
+  .page { max-width: 820px; margin: 0 auto; padding: 48px 40px; }
+  .doc-header { font-family: 'Noto Sans TC', sans-serif; color: #1a1a18; font-size: 14px; line-height: 1.8; }
+  .doc-header .label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+  .doc-header h1 { font-size: 26px; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
+  .doc-header .meta { font-size: 12px; color: #666; display: flex; gap: 24px; margin-top: 12px; flex-wrap: wrap; }
+  .toc { background: #f0ede8; border-radius: 8px; padding: 20px 24px; margin-bottom: 36px; }
+  .toc-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; font-family: 'JetBrains Mono', monospace; margin-bottom: 12px; }
+  .toc-list { display: flex; flex-direction: column; gap: 6px; }
+  .toc-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .toc-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; width: 20px; flex-shrink: 0; }
+  .toc-item a { color: #1a1a18; text-decoration: none; font-weight: 500; }
+  .toc-item a:hover { text-decoration: underline; }
+  .section { margin-bottom: 44px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1.5px solid #e0ddd8; }
+  .section-num { width: 30px; height: 30px; background: #1a1a18; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; }
+  .section-num.new { background: #27ae60; }
+  .section h2 { font-size: 17px; font-weight: 700; }
+  .section-sub { font-size: 12px; color: #888; margin-left: 4px; font-weight: 400; }
+  .steps { display: flex; flex-direction: column; gap: 14px; padding-left: 42px; }
+  .step { display: flex; gap: 14px; align-items: flex-start; }
+  .step-num { width: 24px; height: 24px; border: 1.5px solid #1a1a18; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; font-family: 'JetBrains Mono', monospace; }
+  .step-body { flex: 1; }
+  .step-title { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+  .step-desc { font-size: 13px; color: #555; line-height: 1.7; }
+  .code { background: #1a1a18; color: #a8e6cf; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 12px 16px; border-radius: 6px; margin: 8px 0; line-height: 1.8; }
+  .code .comment { color: #555; }
+  .code .highlight { color: #ffd700; }
+  .notice { border-left: 3px solid #1a1a18; padding: 10px 14px; background: #f0ede8; border-radius: 0 6px 6px 0; margin: 10px 0; font-size: 13px; line-height: 1.7; }
+  .notice.warn { border-color: #c0392b; background: #fdf0ee; }
+  .notice.tip { border-color: #27ae60; background: #f0faf4; }
+  .notice.info { border-color: #2980b9; background: #eef6fb; }
+  .notice strong { font-weight: 600; display: block; margin-bottom: 2px; }
+  .file-tree { background: #1a1a18; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 16px 18px; border-radius: 8px; margin: 10px 0; line-height: 2; }
+  .file-tree .folder { color: #7ec8e3; }
+  .file-tree .file { color: #a8e6cf; }
+  .file-tree .note { color: #555; }
+  .file-tree .highlight { color: #ffd700; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+  .tbl th { background: #1a1a18; color: #fff; padding: 8px 14px; text-align: left; font-weight: 500; font-size: 12px; }
+  .tbl td { padding: 9px 14px; border-bottom: 1px solid #e8e5e0; vertical-align: top; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:nth-child(even) td { background: #f8f7f4; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-blue { background: #e8f0fe; color: #1a56db; }
+  .badge-green { background: #e8faf0; color: #1a7a44; }
+  .badge-red { background: #fef0ee; color: #c0392b; }
+  .badge-yellow { background: #fefce8; color: #854d0e; }
+  .badge-gray { background: #f3f4f6; color: #4b5563; }
+  .badge-new { background: #e8faf0; color: #1a7a44; font-weight: 700; }
+  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px 0; padding-left: 42px; }
+  .flow-item { background: #1a1a18; color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 12.5px; font-weight: 500; }
+  .flow-arrow { color: #888; font-size: 16px; }
+  .flow-auto { background: #27ae60; }
+  .flow-manual { background: #2980b9; }
+  hr { border: none; border-top: 1px solid #e0ddd8; margin: 36px 0; }
+  .doc-footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 11px; color: #999; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; }
+  c { background: #eee; padding: 1px 5px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  @media print { body { background: #fff; } .page { padding: 24px; } }
+
+  /* Ecosystem cards */
+  .eco-grid { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 16px 0; }
+  .eco-card { border: 1.5px solid #1a1a18; border-radius: 10px; padding: 16px; }
+  .eco-card .eco-icon { font-size: 20px; margin-bottom: 8px; }
+  .eco-card .eco-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .eco-card .eco-sub { font-size: 11px; color: #888; margin-bottom: 8px; }
+  .eco-card ul { font-size: 12px; color: #555; padding-left: 16px; line-height: 1.8; }
+  .eco-card.core { border-color: #1a56db; background: #f0f4fe; width: 60%; }
+  .eco-card.cloud { border-color: #27ae60; background: #f0faf4; flex: 1; }
+  .eco-card.personal { border-color: #888; background: #f8f7f4; flex: 1; }
+  .eco-row { display: flex; gap: 14px; width: 100%; }
+  .eco-connector { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 0; }
+  .eco-connector-line { width: 2px; height: 20px; background: #ccc; }
+  .eco-connector-branch { display: flex; width: 60%; justify-content: space-between; align-items: flex-start; }
+  .eco-connector-branch::before { content: ''; display: block; width: 2px; height: 20px; background: #ccc; }
+  .eco-connector-branch::after { content: ''; display: block; width: 2px; height: 20px; background: #ccc; }
+  .eco-connector-h { height: 2px; background: #ccc; flex: 1; margin-top: 19px; }
+  .naming-box { background: #1a1a18; border-radius: 8px; padding: 16px 20px; margin: 10px 0; }
+  .naming-box .formula { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #ffd700; margin-bottom: 12px; }
+  .naming-box .examples { display: flex; flex-direction: column; gap: 6px; }
+  .naming-box .ex { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a8e6cf; }
+  .naming-box .ex .dim { color: #555; }
+  .toc-group { margin-bottom: 12px; }
+  .toc-group-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #bbb; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-header">
+    <div class="label">Standard Operating Procedure</div>
+    <h1>威拓BIM專案管理規範<br>檔案管理架構說明 與 平台操作指南</h1>
+    <div class="meta">
+      <span>📅 版本：v1.0</span>
+      <span>📁 專案：（示範）福祿段新建工程_11503</span>
+      <span>💻 環境：Windows + NAS（群暉 WETOOL）</span>
+    </div>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">目錄</div>
+    <div class="toc-group">
+      <div class="toc-group-label">基礎架構</div>
+      <div class="toc-list">
+        <div class="toc-item"><span class="toc-num">A</span><a href="#sA">檔案管理與資料夾設置目的</a></div>
+        <div class="toc-item"><span class="toc-num">B</span><a href="#sA">威拓資料夾三層級架構</a></div>
+        <div class="toc-item"><span class="toc-num">C</span><a href="#sB">NAS 資料夾架構</a></div>
+        <div class="toc-item"><span class="toc-num">D</span><a href="#sC">Google 雲端共享資料夾架構</a></div>
+        <div class="toc-item"><span class="toc-num">E</span><a href="#sC">圖說收文資料夾命名規範</a></div>
+      </div>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-label">日常操作</div>
+      <div class="toc-list">
+        <div class="toc-item"><span class="toc-num">0</span><a href="#s0">檔案結構說明</a></div>
+        <div class="toc-item"><span class="toc-num">1</span><a href="#s1">每日啟動流程</a></div>
+        <div class="toc-item"><span class="toc-num">2</span><a href="#s2">收到新圖說的流程</a></div>
+        <div class="toc-item"><span class="toc-num">3</span><a href="#s3">問題聯繫追蹤操作</a></div>
+        <div class="toc-item"><span class="toc-num">4</span><a href="#s4">圖說管理操作</a></div>
+        <div class="toc-item"><span class="toc-num">5</span><a href="#s5">模型套圖操作</a></div>
+        <div class="toc-item"><span class="toc-num">6</span><a href="#s5d">Revit 模型套圖同步（Dynamo）</a></div>
+        <div class="toc-item"><span class="toc-num">7</span><a href="#s6">專案時程操作</a></div>
+        <div class="toc-item"><span class="toc-num">8</span><a href="#s7">同事使用方式</a></div>
+        <div class="toc-item"><span class="toc-num">9</span><a href="#s8">匯出 Excel 報表</a></div>
+        <div class="toc-item"><span class="toc-num">10</span><a href="#s9">關閉流程</a></div>
+      </div>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-label">維護與部署</div>
+      <div class="toc-list">
+        <div class="toc-item"><span class="toc-num">11</span><a href="#s10">常見問題排解</a></div>
+        <div class="toc-item"><span class="toc-num">12</span><a href="#s11">新專案部署說明</a></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+
+  <hr>
+
+  <!-- 管理與設置目的 -->
+  <div class="section" id="sC">
+    <div class="section-header">
+      <div class="section-num">A</div>
+      <h2>檔案管理與資料夾設置目的</h2>
+    </div>
+    <div class="subsection">
+      <h3>系統化管理資產與工作流建立</h3>
+      <div class="naming-box">
+        <div class="formula">建立直觀工作流</div>
+        <div class="examples">
+          <div class="ex">透過階層式資料夾，自然引導團隊遵循標準作業程序 (SOP)。</div>
+          <div class="formula">系統化資訊資產</div>
+        <div class="examples">
+          <div class="ex">將非結構化資料轉化為可搜尋、可追蹤的公司核心知識資產。</div>
+        <div class="formula">提升協作效能</div>
+          <div class="examples">
+          <div class="ex">減少內外溝通成本，確保各專業團隊在統一的資訊環境下同步作業。</div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+
+    </div>
+  </div>
+
+  <hr>
+
+
+  <!-- SA 威拓三元生態系統 -->
+  <div class="section" id="sA">
+    <div class="section-header">
+      <div class="section-num">B</div>
+      <h2>威拓資料夾三層級架構</h2>
+    </div>
+    <p style="font-size:13px;color:#555;margin-bottom:16px">公司檔案依存放位置分為三個層級，各自有明確的定位與存取規範，請依規定存放。</p>
+    <div class="eco-grid">
+      <!-- 頂層：核心端 -->
+      <div class="eco-card core">
+        <div class="eco-icon">🗄️</div>
+        <div class="eco-title">核心端（NAS）</div>
+        <div class="eco-sub">嚴格管控 · 完整保存</div>
+        <ul>
+          <li>正式專案資料</li>
+          <li>BIM 資源庫</li>
+          <li>威拓數位資產庫</li>
+        </ul>
+      </div>
+      <!-- 連接線 -->
+      <div class="eco-connector">
+        <div class="eco-connector-line"></div>
+        <div style="display:flex;width:60%;align-items:flex-start">
+          <div style="flex:1;height:2px;background:#ccc;margin-top:0px"></div>
+          <div style="width:2px;height:20px;background:#ccc"></div>
+          <div style="flex:1;height:2px;background:#ccc;margin-top:0px"></div>
+        </div>
+        <div style="display:flex;width:60%;justify-content:space-between">
+          <div style="width:2px;height:20px;background:#ccc;margin-left:0"></div>
+          <div style="width:2px;height:20px;background:#ccc;margin-right:0"></div>
+        </div>
+      </div>
+      <!-- 底層：兩欄 -->
+      <div class="eco-row" style="width:100%;justify-content:center;gap:14px">
+        <div class="eco-card cloud">
+          <div class="eco-icon">☁️</div>
+          <div class="eco-title">共享雲端（Google）</div>
+          <div class="eco-sub">限制範圍 · 對外窗口</div>
+          <ul>
+            <li>業主共享資料區</li>
+            <li>正式成果提交</li>
+            <li>跨公司協作</li>
+            <li>外部收件</li>
+            <li>雲端程式連結放置（例：名片管理）</li>
+          </ul>
+        </div>
+        <div class="eco-card personal">
+          <div class="eco-icon">💻</div>
+          <div class="eco-title">個人端（PC/Notion）</div>
+          <div class="eco-sub">開放自主 · 定期同步</div>
+          <ul>
+            <li>個人工作流程</li>
+            <li>備份工作中的專案檔與圖說</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="notice info" style="margin-top:8px">
+      <strong>💡 核心原則</strong>
+      正式資料一律存入 NAS 核心端。個人端僅作為工作暫存，完成後需同步回 NAS。Google 雲端僅用於對外交付，不作為主要儲存位置。
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- SB NAS 資料夾架構 -->
+  <div class="section" id="sB">
+    <div class="section-header">
+      <div class="section-num">C</div>
+      <h2>NAS 資料夾架構</h2>
+    </div>
+    <div class="subsection">
+      <h3>核心層級架構</h3>
+      <div class="file-tree">
+<span class="folder">威拓核心 NAS\</span><br>
+├── <span class="highlight">BIM專案資料夾\</span><br>
+│&nbsp;&nbsp;&nbsp;└── <span class="folder">[業主名稱]\</span>&nbsp;&nbsp;<span class="note">← 例：市都發、谷合營造</span><br>
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">[專案名稱]_[簽約日期]\</span>&nbsp;&nbsp;<span class="note">← 例：福祿段新建工程_11503</span><br>
+├── <span class="highlight">BIM資源資料夾\</span>&nbsp;&nbsp;<span class="note">← 公司核心資產（元件庫、SOP、範本）</span><br>
+└── <span class="highlight">（待新增）\</span>&nbsp;&nbsp;<span class="note">← 視未來營運情況新增</span>
+      </div>
+    </div>
+    <div class="subsection">
+      <h3>專案層級架構</h3>
+      <div class="file-tree">
+<span class="folder">[專案名稱]_[簽約日期]\</span><br>
+├── <span class="folder">01_圖說管理\</span><br>
+│&nbsp;&nbsp;&nbsp;├── <span class="folder highlight">【圖說收文自動化】\</span>&nbsp;&nbsp;<span class="note">← 自動化腳本與 Excel</span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">run.py</span>&nbsp;&nbsp;<span class="note">← Python自動化腳本</span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file highlight">啟動收文自動化.bat<span>&nbsp;&nbsp;<span class="note">← 批次執行檔。啟動後自動執行收文監控腳本。</span></span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">[專案名稱]_收文紀錄.xlsx</span>&nbsp;&nbsp;<span class="note">← Python抓到並分類的所有圖說</span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">.processed_files.txt</span>&nbsp;&nbsp;<span class="note">← 勿刪，記錄哪些圖說已處理過。</span><br>
+│&nbsp;&nbsp;&nbsp;└── <span class="folder highlight">【圖說管理平台】\</span>&nbsp;&nbsp;<span class="note">← 專案管理平台網頁</span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">index.html</span>&nbsp;&nbsp;<span class="note">← 專案管理平台前端畫面</span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">server.py<span>&nbsp;&nbsp;<span class="note">← 平台後端伺服器，沒有它平台就跑不起來。</span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file highlight">啟動伺服器.bat</span>&nbsp;&nbsp;<span class="note">← 批次執行檔，啟動後自動執行後台伺服器。</span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">data.json</span>&nbsp;&nbsp;<span class="note">← 平台資料庫，儲存你在平台上輸入的所有資料。</span><br>
+│&nbsp;&nbsp;&nbsp;├── <span class="folder">01_業主提供\</span><br>
+│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">01_收文記錄\</span>&nbsp;&nbsp;<span class="note">← 業主給的圖說存放這裡（見 C 節命名規範）</span><br>
+│&nbsp;&nbsp;&nbsp;└──<span class="folder">02_連結圖說\</span>&nbsp;&nbsp;<span class="note">← 連結進Revit的底圖（見 6 節Revit模型套圖同步）</span><br>
+├── <span class="folder">02_文件管理\</span>&nbsp;&nbsp;<span class="note">← 合約、會議記錄、規範、BEP等文件存放區</span><br>
+├── <span class="folder">03_模型管理\</span>&nbsp;&nbsp;<span class="note">← 工作中、協調用之各類模型檔案：Revit、IFC、Navisworks</span><br>
+├── <span class="folder">04_釋疑管理\</span>&nbsp;&nbsp;<span class="note">← 釋疑提交紀錄</span><br>
+└── <span class="folder">05_提交管理\</span>&nbsp;&nbsp;<span class="note">← 正式交付成果</span>
+      </div>
+          <div class="notice info" style="margin-top:12px">
+      <strong>💡 重要提醒</strong>
+      <c>.processed_files.txt</c> 記錄哪些圖說已處理過，絕對不能刪除。即使刪除，新版 run.py 仍有第二道防護（比對 Excel 內容），但還是建議保留。
+    </div>
+         <div class="notice info" style="margin-top:12px">
+      <strong>💡 data.jason 資料庫結構說明</strong>
+      <c>data.jason</c> 就是平台的資料庫，儲存你在平台上輸入的所有資料，包含四大類：
+        <tr><td><strong>contacts</strong></td><td>問題聯繫追蹤的所有記錄，每一筆溝通記錄、日期、類型、狀態等。</td></tr>
+        <tr><td><strong>drawings</strong></td><td>圖說管理的所有記錄，每一筆收文的檔名、日期、來源、狀態（未審閱/已審閱...）等。</td></tr>
+        <tr><td><strong>models</strong></td><td>模型套圖的所有記錄，每一筆 Revit 套圖的 CAD 檔名、套用日期、比對狀態等。</td></tr>
+        <tr><td><strong>project</strong></td><td>專案名稱、業主、負責人等設定， 所以你在平台上做的任何新增、編輯、刪除，最終都是在讀寫這個。</td></tr>
+        </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- SB Google 資料夾架構 -->
+  <div class="section" id="sB">
+    <div class="section-header">
+      <div class="section-num">D</div>
+      <h2>Google 雲端共享資料夾架構</h2>
+    </div>
+    <p style="font-size:13px;color:#555;margin-bottom:16px">作為業主檔案備份與傳輸共享區。</p>
+  <div class="eco-grid">
+  <div class="subsection">
+      <h3>核心層級架構</h3>
+      <div class="file-tree">
+<span class="folder">威拓科技整合有限公司\</span><br>
+├── <span class="highlight">【業主名稱】專案名稱\</span>&nbsp;&nbsp;<span class="note">← 例：【市都發】福祿段_11503</span><br>
+│&nbsp;&nbsp;&nbsp;└── <span class="folder">【共享】福祿段\</span>&nbsp;&nbsp;<span class="note">← 此為與業主共享之資料夾，作為對外交付用。</span><br>
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">01_圖說\</span>&nbsp;&nbsp;<span class="note">← 業主給的圖說備份處（NAS一份，雲端一份，資料夾規劃照NAS避免混淆。）</span><br>
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">02_文件\</span>&nbsp;&nbsp;<span class="note">← 業主給的文件類備份處（例：工期表、合約）</span><br>
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">03_釋疑\</span>&nbsp;&nbsp;<span class="note">← 業主給的釋疑放置區</span><br>
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">04_威拓提交區\</span>&nbsp;&nbsp;<span class="note">← 威拓交給業主的內容放在這裡，別無他處，依日期建置資料夾。</span><br>
+└── <span class="highlight">（待新增）\</span>&nbsp;&nbsp;<span class="note">← 視未來營運情況新增，目前僅放置「名片管理」連結表單。</span>
+        </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- SC 收文命名規範 -->
+  <div class="section" id="sC">
+    <div class="section-header">
+      <div class="section-num">E</div>
+      <h2>圖說收文資料夾命名規範</h2>
+    </div>
+    <p style="font-size:13px;color:#555;margin-bottom:14px">收文記錄資料夾的命名直接影響 Python 腳本能否正確抓取日期和來源，請嚴格遵守以下格式。</p>
+    <div class="subsection">
+      <h3>命名格式</h3>
+      <div class="naming-box">
+        <div class="formula">YYYYMMDD_管道_來源_類型</div>
+        <div class="examples">
+          <div class="ex">20260412_LINE_楊主任_建築施工 <span class="dim">← 日期_管道_來源_類型</span></div>
+          <div class="ex">20260412_LINE_何協理_景觀+公設 <span class="dim">← 多類型用 + 連接</span></div>
+          <div class="ex">20260415_Email_業主_建築+結構建照</div>
+          <div class="ex">20260415_現場_楊主任_結構施工</div>
+        </div>
+      </div>
+    </div>
+    <div class="subsection">
+      <h3>各欄位說明</h3>
+      <table class="tbl">
+        <tr><th>欄位</th><th>說明</th><th>範例</th></tr>
+        <tr><td><strong>YYYYMMDD</strong></td><td>收文日期，8碼數字，<strong>必填</strong><br>腳本從這裡抓取「收文日期」欄位</td><td><c>20260412</c></td></tr>
+        <tr><td><strong>管道</strong></td><td>收到圖說的方式</td><td><c>LINE</c> <c>Email</c> <c>現場</c> <c>Google雲端</c></td></tr>
+        <tr><td><strong>來源</strong></td><td>提供圖說的人或單位</td><td><c>楊主任</c> <c>何協理</c> <c>業主</c></td></tr>
+        <tr><td><strong>類型</strong></td><td>圖說的專業類型，多類型用 <c>+</c> 連接</td><td><c>建築</c> <c>結構</c> <c>機電</c> <c>景觀</c> <c>全專業</c></td></tr>
+      </table>
+    </div>
+    <div class="notice warn">
+      <strong>⚠️ 最重要的規則</strong>
+      資料夾名稱最前面必須為日期，腳本依靠這個規則抓取日期。
+      <strong>⚠️ 開頭 8 碼數字 YYYYMMDD</strong>若日期格式錯誤，Excel 的收文日期欄位將會空白，將影響後續平台抓取最新圖說與套用圖說資訊。
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S0 -->
+  <div class="section" id="s0">
+    <div class="section-header">
+      <div class="section-num">0</div>
+      <h2>專案「圖說管理」資料夾結構說明</h2>
+    </div>
+    <div class="file-tree">
+\\WETOOL\wt\BIM專案資料夾\市都發\福祿段新建工程_11503\<br>
+└── <span class="folder">01_圖說管理\</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">01_業主提供\</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="folder">01_收文記錄\</span>&nbsp;&nbsp;<span class="note">← 圖說存放這裡</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">02_連結圖說\</span>&nbsp;&nbsp;<span class="note">← Revit 連結的 CAD 底圖</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder highlight">【圖說收文自動化】\</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file highlight">啟動收文自動化.bat</span>&nbsp;&nbsp;<span class="note">← 雙擊啟動</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">run.py</span>&nbsp;&nbsp;<span class="note">← 自動監控腳本（含雙重防重複）</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">福祿段_收文紀錄.xlsx</span>&nbsp;&nbsp;<span class="note">← 收文 Excel</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">.processed_files.txt</span>&nbsp;&nbsp;<span class="note">← 已處理紀錄（勿刪）</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder highlight">【圖說管理平台】\</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file highlight">啟動伺服器.bat</span>&nbsp;&nbsp;<span class="note">← 雙擊啟動</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">server.py</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">index.html</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">data.json</span>&nbsp;&nbsp;<span class="note">← 平台資料（自動產生）</span>
+    </div>
+    <div class="notice info" style="margin-top:12px">
+      <strong>💡 重要提醒</strong>
+      <c>.processed_files.txt</c> 記錄哪些圖說已處理過，絕對不能刪除。即使刪除，新版 run.py 仍有第二道防護（比對 Excel 內容），但還是建議保留。
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>【尚在測試中+補圖】每日啟動流程 <span class="section-sub">負責人操作，每天開始工作時執行</span></h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">啟動平台伺服器</div>
+          <div class="step-desc">開啟檔案總管，進入 NAS 的 <c>【圖說管理平台】</c> 資料夾</div>
+          <div class="step-desc">雙擊 <strong>啟動伺服器.bat</strong>，看到以下訊息代表成功：</div>
+          <div class="code">  工程專案管理平台 - 伺服器啟動中<br>  本機存取：http://localhost:8080/</span>&nbsp;&nbsp;<span class="note">← 專案負責人主控</span><br>  內網存取：http://192.168.0.103:8080/</span>&nbsp;&nbsp;<span class="note">← 尚在測試中，未來希望同事連內網即可協作。</span><br></div>
+          <div class="notice warn" style="margin-top:6px"><strong>⚠️ 此視窗不能關！</strong>關閉 = 同事無法連線</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">啟動收文自動化監控</div>
+          <div class="step-desc">進入 NAS 的 <c>【圖說收文自動化】</c> 資料夾</div>
+          <div class="step-desc">雙擊 <strong>啟動收文自動化.bat</strong>，看到以下訊息代表成功：</div>
+          <div class="code">  圖說收文紀錄自動化 v9 - 啟動中<br>  監控資料夾：\\WETOOL\...\01_收文記錄<br>  開始監控，每 60 秒掃描一次</div>
+          <div class="notice warn" style="margin-top:6px"><strong>⚠️ 此視窗也不能關！</strong>關閉 = 新圖說不會自動更新</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">開啟平台網頁</div>
+          <div class="code">http://localhost:8080/</div>
+          <div class="step-desc">建議存成書籤方便下次使用。左下角綠點「已連線」= 一切正常</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>收到新圖說的流程【待補圖】</h2><span class="section-sub">於 專案資料夾「01_圖說管理/01_業主提供」</span></h2>
+    </div>
+    <div class="flow">
+      <div class="flow-item flow-manual">收到圖說</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item flow-manual">存進收文記錄資料夾</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item flow-auto">自動更新 Excel ✦</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item flow-auto">自動同步平台 ✦</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item flow-manual">F5 重新整理</div>
+    </div>
+    <p style="padding-left:42px;font-size:11px;color:#888;margin-top:4px">✦ 綠色步驟全自動，不需要手動操作</p>
+    <div class="steps" style="margin-top:16px">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">建立收文資料夾（每批一個）</div>
+          <div class="step-desc">在 <c>01_業主提供\01_收文記錄\</c> 裡新增資料夾，命名格式：</div>
+          <div class="code">YYYYMMDD_來源名稱<br><span class="comment">例如：20260412_LINE楊主任提供</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">把圖說檔案存進資料夾</div>
+          <div class="step-desc">支援格式：<strong>.pdf、.dwg、.dxf、.rvt、.ifc</strong>，可以整批複製貼上</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">等待自動處理（最多 60 秒）</div>
+          <div class="code">  ✅ 2026/04/12 | LINE楊主任提供 | 施工圖 | 建築 | A2-05.dwg<br>  📊 Excel 已寫入 3 筆<br>  🔄 平台已同步：N 筆圖說資料</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">重新整理平台網頁</div>
+          <div class="step-desc">按 <strong>F5</strong>，圖說管理就會出現新資料</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>問題聯繫追蹤操作【待補圖】 <span class="section-sub">於專案管理平台</span></h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">A</div>
+        <div class="step-body">
+          <div class="step-title">新增聯繫記錄</div>
+          <div class="step-desc">左側選「問題聯繫追蹤」→ 右上角「＋ 新增記錄」→ 填寫欄位後儲存</div>
+          <table class="tbl" style="margin-top:8px">
+            <tr><th>欄位</th><th>說明</th><th>必填</th></tr>
+            <tr><td>提送日期</td><td>溝通當天日期</td><td><span class="badge badge-red">必填</span></td></tr>
+            <tr><td>類型</td><td>釋疑 / 變更 / 確認 / 通知 / 其他</td><td><span class="badge badge-red">必填</span></td></tr>
+            <tr><td>釋疑概述</td><td>溝通事項內容描述</td><td><span class="badge badge-red">必填</span></td></tr>
+            <tr><td>提送人員</td><td>發出這筆記錄的人</td><td><span class="badge badge-yellow">建議填</span></td></tr>
+            <tr><td>狀態</td><td>待回覆 / 已回覆 / 等待中 / 緊急</td><td><span class="badge badge-yellow">建議填</span></td></tr>
+            <tr><td>回覆日期 / 概述</td><td>業主回覆後補填</td><td><span class="badge badge-green">選填</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">B</div>
+        <div class="step-body">
+          <div class="step-title">更新回覆狀態</div>
+          <div class="step-desc">業主回覆後，找到該筆記錄 → 點「編輯」→ 填入回覆日期、回覆概述 → 狀態改為「已回覆」→ 儲存</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>圖說管理操作【待補圖】</h2>
+    </div>
+
+    <div class="notice info" style="margin-bottom:16px">
+      <strong>📌 狀態說明</strong>
+      <span class="badge badge-yellow">未審閱</span> 收到尚未確認　<span class="badge badge-green">已審閱</span> 已確認可用　<span class="badge badge-red">已作廢</span> 不再使用　<span class="badge badge-gray">不需要</span> 模型不需要
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">A</div>
+        <div class="step-body">
+          <div class="step-title">單筆修改狀態</div>
+          <div class="step-desc">找到該圖說 → 點「編輯」→ 狀態選擇「已審閱 / 已作廢 / 不需要」→ 點「儲存圖說」</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">B</div>
+        <div class="step-body">
+          <div class="step-title">批次修改狀態 <span class="badge badge-new">新功能</span></div>
+          <div class="step-desc">勾選左側勾選框選取多筆 → 上方紫色列出現 → 點「未審閱 / 已審閱 / 已作廢 / 不需要」批次套用</div>
+          <div class="notice tip" style="margin-top:6px">
+            <strong>💡 Shift 多選技巧</strong>
+            勾選第一筆後，按住 Shift 再勾選最後一筆，中間全部自動選取
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">C</div>
+        <div class="step-body">
+          <div class="step-title">新增版次（同一張圖收到新版本）</div>
+          <div class="step-desc">找到該圖說 → 點藍色版次號碼 → 「新增版次」→ 輸入新版次號與檔名 → 舊版自動保留歷史</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">D</div>
+        <div class="step-body">
+          <div class="step-title">搜尋與篩選</div>
+          <div class="step-desc">搜尋欄輸入關鍵字，或使用下拉選單篩選：全部狀態 / 全部階段 / 全部專業</div>
+          <div class="notice tip" style="margin-top:6px">
+            <strong>💡 批次篩選後全選技巧</strong>
+            先用篩選器選好條件（例如只顯示「未審閱」），再點全選勾選框，一次批次修改篩選後的所有圖說
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num new">5</div>
+      <h2>模型套圖操作【待補圖】<span class="section-sub">旁邊為什麼是綠色</span></h2>
+    </div>
+    <p style="padding-left:42px;font-size:13px;color:#555;margin-bottom:16px">追蹤 Revit 模型目前套用的 CAD 底圖版本，並與收文紀錄自動比對是否有更新版本。</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">A</div>
+        <div class="step-body">
+          <div class="step-title">Dynamo 自動同步（主要方式）</div>
+          <div class="step-desc">執行 <c>匯出CAD連結到平台.dyn</c>，從 Revit 自動把目前所有 CAD 連結資訊同步到平台，不需要手動一筆一筆新增。</div>
+          <div class="notice tip" style="margin-top:6px">詳細操作步驟請見第 6 節「Revit 模型套圖同步（Dynamo）」</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">B</div>
+        <div class="step-body">
+          <div class="step-title">比對狀態說明</div>
+          <table class="tbl" style="margin-top:8px">
+            <tr><th>狀態</th><th>說明</th></tr>
+            <tr><td><span class="badge badge-green">已是最新</span></td><td>收文紀錄裡沒有比目前套用版本更新的同名 CAD</td></tr>
+            <tr><td><span class="badge badge-red">有新版本</span></td><td>收文紀錄裡有更新日期的同名 CAD，需要更新套圖</td></tr>
+            <tr><td><span class="badge badge-gray">已停用</span></td><td>此套圖記錄已手動標記停用</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">C</div>
+        <div class="step-body">
+          <div class="step-title">重新比對</div>
+          <div class="step-desc">收到新圖說後，點右上角「重新比對」按鈕，系統會自動更新所有記錄的比對狀態</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">D</div>
+        <div class="step-body">
+          <div class="step-title">手動新增套圖記錄（備用，這要重寫，或者不要放。有問題要調DYNAMO，不是手動新增解決。）</div>
+          <div class="step-desc">若 Dynamo 未能抓到某筆記錄，可手動補充：左側選「模型套圖」→ 右上角「＋ 新增套圖記錄」→ 填寫以下欄位：</div>
+          <table class="tbl" style="margin-top:8px">
+            <tr><th>欄位</th><th>說明</th></tr>
+            <tr><td>Revit 圖說名稱</td><td>Revit 裡的視圖名稱，例如：A2-05 二樓平面圖</td></tr>
+            <tr><td>目前套用 CAD 檔名</td><td>目前 Revit 內連結的 CAD 底圖檔名</td></tr>
+            <tr><td>套用版次 / 日期</td><td>這份 CAD 是哪個版次、哪天套的</td></tr>
+            <tr><td>專業 / 樓層 / 階段</td><td>分類用</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <div class="section" id="s5d">
+    <div class="section-header">
+      <div class="section-num new">6</div>
+      <h2>Revit 模型套圖同步 <span class="section-sub">Dynamo 腳本操作</span></h2>
+    </div>
+    <p style="padding-left:42px;font-size:13px;color:#555;margin-bottom:16px">透過 Dynamo 腳本，將 Revit 模型中的 CAD 連結資訊自動同步到平台的「模型套圖」模組，並與收文紀錄自動比對版本狀態。</p>
+    <div style="padding-left:42px">
+      <p style="font-size:13px;font-weight:600;margin-bottom:8px">前置條件</p>
+      <table class="tbl" style="margin-bottom:20px">
+        <tr><th>項目</th><th>說明</th></tr>
+        <tr><td>Revit 模型位置</td><td>必須存放在 NAS 上，不能在本機</td></tr>
+        <tr><td>CAD 底圖位置</td><td>存放在 NAS 的 <c>02_整理圖說\</c> 資料夾，連結路徑必須指向 NAS</td></tr>
+        <tr><td>Dynamo 版本</td><td>Revit 2024 內建 Dynamo，Python 引擎使用 CPython3</td></tr>
+        <tr><td>平台伺服器</td><td>執行前確認平台伺服器已啟動</td></tr>
+      </table>
+      <p style="font-size:13px;font-weight:600;margin-bottom:8px">CAD 底圖命名規範參考 <span class="section-sub">此端為專案負責人習慣為主，可以自己能辨別的方式作命名</span></p>
+      <div class="code" style="margin-bottom:8px">[專業代碼]-[樓層代碼]<br><span class="comment">A-1FL.dwg　← 建築 一層平面</span><br><span class="comment">A-B3FL.dwg　← 建築 地下三層平面</span><br><span class="comment">S-1FL.dwg　← 結構 一層平面</span><br><span class="comment">S-筏基.dwg　← 結構 筏基層</span></div>
+      <table class="tbl" style="margin-bottom:8px">
+        <tr><th>專業代碼</th><th>說明</th></tr>
+        <tr><td><c>A-</c></td><td>建築</td></tr>
+        <tr><td><c>S-</c></td><td>結構</td></tr>
+        <tr><td><c>M-</c></td><td>機電</td></tr>
+        <tr><td><c>L-</c></td><td>景觀</td></tr>
+      </table>
+      <div class="notice info" style="margin-bottom:20px">
+        <strong>💡 階段不放在檔名裡</strong>
+        建照圖 / 施工圖 / 竣工圖的區分用資料夾和平台欄位管理，不放進 CAD 檔名，避免 Revit 連結斷掉。
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-item flow-manual">在 Revit 連結 CAD</div><div class="flow-arrow">→</div>
+      <div class="flow-item flow-manual">開啟 Dynamo 執行腳本</div><div class="flow-arrow">→</div>
+      <div class="flow-item flow-auto">自動寫入平台 ✦</div><div class="flow-arrow">→</div>
+      <div class="flow-item flow-manual">平台按「重新比對」</div>
+    </div>
+    <p style="padding-left:42px;font-size:11px;color:#888;margin:4px 0 16px">✦ 綠色步驟全自動</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">把 .dyn 腳本放到 NAS</div><div class="step-desc">將 <c>匯出CAD連結到平台.dyn</c> 放進 NAS 的 <c>【圖說管理平台】\</c></div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">從 Revit 內部開啟 Dynamo</div><div class="step-desc">上方選單 → <strong>管理</strong> → <strong>視覺程式設計</strong> → <strong>Dynamo</strong>（左邊那個，不是播放器）</div><div class="notice warn" style="margin-top:6px"><strong>⚠️ 必須從 Revit 內部開啟</strong>直接開啟獨立的 Dynamo 應用程式無法連到模型，腳本會出錯</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">開啟腳本檔案</div><div class="step-desc">Dynamo 裡 → <strong>檔案 → 開啟</strong> → 找到 <c>匯出CAD連結到平台.dyn</c></div><div class="step-desc">如果出現「開啟外部檔案？」→ 勾選「以後都信任此位置」→ 按「是」</div></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">確認 Python 引擎是 CPython3</div><div class="step-desc">雙擊 Python Script 節點 → 右上角下拉選單確認是 <strong>CPython3</strong></div></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">按左下角「執行」</div><div class="step-desc">Python Script 節點下方顯示找到的 CAD 連結清單 = 執行成功</div></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body"><div class="step-title">回到平台按「重新比對」</div><div class="step-desc">模型套圖頁面右上角 → 點「重新比對」→ 平台自動與收文紀錄比對，更新版本狀態</div></div></div>
+    </div>
+    <div style="padding-left:42px;margin-top:20px">
+      <p style="font-size:13px;font-weight:600;margin-bottom:8px">腳本行為說明</p>
+      <table class="tbl">
+        <tr><th>情況</th><th>腳本行為</th></tr>
+        <tr><td>第一次執行</td><td>抓取所有 CAD 連結，套用日期 = 今天，寫入平台</td></tr>
+        <tr><td>再次執行（舊連結）</td><td>保留原本套用日期，不覆蓋</td></tr>
+        <tr><td>新增 CAD 連結後執行</td><td>只有新的那筆套用日期 = 今天，舊的不變</td></tr>
+        <tr><td>手動在平台填的資料</td><td>執行後保留，不會被覆蓋</td></tr>
+      </table>
+    </div>
+    <div class="notice" style="margin-left:42px;margin-top:16px">
+      <strong>📌 新專案部署時需修改 Dynamo 腳本路徑</strong>
+      在 Python Script 節點裡找到這行並修改：
+      <div class="code" style="margin-top:8px">DATA_JSON = r"<span class="highlight">\NAS位址\...\新專案\01_圖說管理\【圖說管理平台】\data.json</span>"</div>
+    </div>
+  </div>
+
+  <hr>
+
+
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>專案時程操作</h2>
+    </div>
+    <p style="padding-left:42px;font-size:13px;color:#555;margin-bottom:16px">管理施工期程、BIM 進度等任務，支援甘特圖與日曆兩種檢視，預設開啟日曆頁面。</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">A</div>
+        <div class="step-body">
+          <div class="step-title">新增任務</div>
+          <div class="step-desc">左側選「專案時程」→ 右上角「＋ 新增任務」→ 填寫以下欄位：</div>
+          <table class="tbl" style="margin-top:8px">
+            <tr><th>欄位</th><th>說明</th></tr>
+            <tr><td>任務名稱</td><td>必填，例如：【建模】B3F 結構+建築介面突破討論</td></tr>
+            <tr><td>開始 / 結束日期</td><td>必填</td></tr>
+            <tr><td>任務類型</td><td>點下方標籤選取，或自行輸入後按 Enter 新增。可多選。顏色依類型自動對應</td></tr>
+            <tr><td>狀態</td><td>待開始 / 進行中 / 已完成 / 延遲</td></tr>
+            <tr><td>備註</td><td>其他說明</td></tr>
+          </table>
+          <div class="notice tip" style="margin-top:8px">
+            <strong>💡 任務類型與顏色對應</strong>
+            建模（藍）、修模回覆（橙）、施工（青）、RFI（黃）、協調會（紫）、送審（綠）、其他（灰）
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">B</div>
+        <div class="step-body">
+          <div class="step-title">切換甘特圖 / 日曆</div>
+          <div class="step-desc">右上角「甘特圖」、「日曆」兩個按鈕切換檢視，預設開啟日曆</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">C</div>
+        <div class="step-body">
+          <div class="step-title">甘特圖操作</div>
+          <div class="step-desc">可用上方「類型」、「狀態」篩選器過濾任務，點任務條可編輯，左右捲動可看不同月份</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="border-color:#2980b9;color:#2980b9">D</div>
+        <div class="step-body">
+          <div class="step-title">日曆操作</div>
+          <div class="step-desc">點「上個月」、「下個月」切換月份，點「今天」回到本月。點日曆上的任務可編輯</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>同事使用方式 <span class="section-sub">只需要瀏覽器。目前這個有很大問題！需要再調整與同事協作方式！</span></h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">確認負責人已啟動伺服器</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">用瀏覽器開啟內網網址（存成書籤）</div>
+          <div class="code">http://192.168.0.103:8080/</div>
+        </div>
+      </div>
+    </div>
+    <div class="notice tip" style="margin-left:42px;margin-top:12px">
+      <strong>✅ 所有人共用同一份資料</strong>
+      任何人新增或修改後，其他人按 F5 就能看到最新資料
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <h2>匯出 Excel 報表</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">匯出問題聯繫紀錄</div>
+          <div class="step-desc">左側選「問題聯繫追蹤」→ 右上角「匯出 Excel」</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">匯出圖說收文紀錄</div>
+          <div class="step-desc">左側選「圖說管理」→ 右上角「匯出 Excel」，或直接開啟 NAS 上的 <c>福祿段_收文紀錄.xlsx</c>（含顏色格式的完整版）</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">匯出模型套圖紀錄</div>
+          <div class="step-desc">左側選「模型套圖」→ 右上角「匯出 Excel」</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>關閉流程</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><div class="step-title">通知同事即將關閉</div></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">關閉兩個 CMD 視窗</div>
+          <div class="step-desc">直接關閉「啟動伺服器」和「啟動收文自動化」兩個黑色視窗，或按 <strong>Ctrl + C</strong> 後關閉</div>
+        </div>
+      </div>
+    </div>
+    <div class="notice" style="margin-left:42px;margin-top:12px">
+      <strong>💾 資料安全</strong>
+      每次操作都會即時自動儲存到 NAS 的 data.json，不需要手動存檔。
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>常見問題排解</h2>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>問題</th><th>原因</th><th>解決方式</th></tr></thead>
+      <tbody>
+        <tr><td>.bat 雙擊跳一下就消失</td><td>bat 檔編碼錯誤</td><td>用記事本開啟 → 另存新檔 → 編碼選 ANSI → 換行選 Windows (CRLF) → 存檔類型「所有檔案」→ 副檔名 .bat</td></tr>
+        <tr><td>同事打開網址顯示「無法連線」</td><td>伺服器未啟動或視窗被關</td><td>確認負責人電腦上「啟動伺服器」視窗是否還開著</td></tr>
+        <tr><td>新圖說存進資料夾後平台沒更新</td><td>自動化視窗被關，或還未到 60 秒</td><td>確認「啟動收文自動化」視窗是否還開著，等待最多 60 秒後按 F5</td></tr>
+        <tr><td>平台左下角顯示紅點</td><td>伺服器連線中斷</td><td>重新雙擊「啟動伺服器.bat」，再重新整理網頁</td></tr>
+        <tr><td>圖說資料重複出現</td><td>.processed_files.txt 遺失</td><td>新版 run.py 有雙重防護，重新啟動自動化腳本即可。若仍重複，執行「清理重複資料.py」</td></tr>
+        <tr><td>編輯圖說儲存後沒有變化</td><td>資料有重複 id</td><td>執行「清理重複資料.py」修復 data.json</td></tr>
+        <tr><td>批次修改只改到一筆</td><td>同上，重複 id 問題</td><td>執行「清理重複資料.py」修復 data.json</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <div class="section-num new">12</div>
+      <h2>新專案部署說明</h2>
+    </div>
+    <p style="padding-left:42px;font-size:13px;color:#555;margin-bottom:16px">開始一個新專案時，只需要複製現有資料夾並修改幾個路徑設定。</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">在 NAS 建立新專案資料夾結構</div>
+          <div class="file-tree">
+新專案\<br>
+└── <span class="folder">01_圖說管理\</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">01_業主提供\01_收文記錄\</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">02_整理圖說\</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder highlight">【圖說收文自動化】\</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder highlight">【圖說管理平台】\</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">複製平台檔案</div>
+          <table class="tbl" style="margin-top:8px">
+            <tr><th>複製哪個檔案</th><th>放到哪裡</th></tr>
+            <tr><td><c>server.py</c></td><td>新專案 <c>【圖說管理平台】\</c></td></tr>
+            <tr><td><c>index.html</c></td><td>新專案 <c>【圖說管理平台】\</c></td></tr>
+            <tr><td><c>啟動伺服器.bat</c></td><td>新專案 <c>【圖說管理平台】\</c></td></tr>
+            <tr><td><c>run.py</c></td><td>新專案 <c>【圖說收文自動化】\</c></td></tr>
+            <tr><td><c>啟動收文自動化.bat</c></td><td>新專案 <c>【圖說收文自動化】\</c></td></tr>
+          </table>
+          <div class="notice warn" style="margin-top:8px">
+            <strong>⚠️ 不要複製這些檔案</strong>
+            <c>data.json</c>、<c>.processed_files.txt</c>、<c>福祿段_收文紀錄.xlsx</c> 都是舊專案的資料
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">修改 run.py 的路徑設定</div>
+          <div class="code"><span class="comment"># ★ 路徑設定區（只需要改這裡）★</span><br><br>WATCH_FOLDER  = r"<span class="highlight">\\WETOOL\wt\...\新專案\01_圖說管理\01_業主提供\01_收文記錄</span>"<br>EXCEL_PATH    = r"<span class="highlight">\\WETOOL\wt\...\新專案\01_圖說管理\【圖說收文自動化】\新專案_收文紀錄.xlsx</span>"<br>DATA_JSON     = r"<span class="highlight">\\WETOOL\wt\...\新專案\01_圖說管理\【圖說管理平台】\data.json</span>"<br>PROCESSED_LOG = r"<span class="highlight">\\WETOOL\wt\...\新專案\01_圖說管理\【圖說收文自動化】\.processed_files.txt</span>"</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">修改兩個 bat 檔的路徑</div>
+          <div class="step-desc">用記事本開啟，分別修改 net use 那行路徑，換成新專案對應資料夾。存檔編碼選 <strong>ANSI</strong>，換行選 <strong>Windows (CRLF)</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">修改平台的專案名稱</div>
+          <div class="step-desc">開啟平台網頁後，左側點「專案設定」→ 修改專案名稱、業主名稱、負責人 → 儲存</div>
+        </div>
+      </div>
+    </div>
+    <div class="notice tip" style="margin-left:42px;margin-top:16px">
+      <strong>✅ 總結：新專案只需要改 4 個地方</strong>
+      run.py 的 4 行路徑 + 啟動伺服器.bat 的 1 行 + 啟動收文自動化.bat 的 1 行 + 平台裡的專案設定
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>工程專案管理平台 完整操作 SOP v5.0</span>
+    <span>福祿段新建工程＿11503 · 2026/04/12</span>
+  </div>
+
+</div>
+</body>
+</html>
